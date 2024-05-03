@@ -15,7 +15,9 @@
 
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // Days of the week
 const (
@@ -37,6 +39,18 @@ const (
 	Guest      = 50
 )
 
+func isWeekday(day int) bool {
+	return day >= Monday && day <= Friday
+}
+
+func isWeekend(day int) bool {
+	return day == Saturday || day == Sunday
+}
+
+func isEveryOther(day int) bool {
+	return day == Monday || day == Wednesday || day == Friday
+}
+
 func accessGranted() {
 	fmt.Println("Granted")
 }
@@ -45,9 +59,31 @@ func accessDenied() {
 	fmt.Println("Denied")
 }
 
+func checkAccess(day int, role int) bool {
+	if role == Admin || role == Manager {
+		//* Access at any time: Admin, Manager
+		return true
+	} else if role == Contractor && isWeekend(day) {
+		//* Access weekends: Contractor
+		return true
+	} else if role == Member && isWeekday(day) {
+		//* Access weekdays: Member
+		return true
+	} else if role == Guest && isEveryOther(day) {
+		//* Access Mondays, Wednesdays, and Fridays: Guest
+		return true
+	}
+
+	return false
+}
+
 func main() {
 	// The day and role. Change these to check your work.
-	today, role := Tuesday, Guest
+	today, role := Sunday, Contractor
 
-	accessGranted()
+	if checkAccess(today, role) {
+		accessGranted()
+	} else {
+		accessDenied()
+	}
 }
